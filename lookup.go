@@ -11,14 +11,14 @@ import (
 func lookup(filepath string, offset int) (Definition, error) {
 	def := Definition{}
 
-	f, err := parser.ParseFile(g_fileset, filepath, nil, 0, getScope(filepath))
+	f, err := parser.ParseFile(fileset, filepath, nil, 0, getScope(filepath))
 	if err != nil {
 		return def, err
 	}
 
 	containsOffset := func(node ast.Node) bool {
-		from := g_fileset.Position(node.Pos()).Offset
-		to := g_fileset.Position(node.End()).Offset
+		from := fileset.Position(node.Pos()).Offset
+		to := fileset.Position(node.End()).Offset
 		return offset >= from && offset < to
 	}
 
@@ -42,12 +42,13 @@ func lookup(filepath string, offset int) (Definition, error) {
 		return def, errors.New("no identifier found")
 	}
 
-	obj, _ := types.ExprType(ident, types.DefaultImporter)
-	if obj == nil {
-		return def, errors.New("identifier has no definition")
+	pos := getDefPosition(ident)
+	if pos == nil {
+		return def, errors.New("could not find definition of identifier")
 	}
 
+	obj, _ := types.ExprType(ident, types.DefaultImporter)
 	def.Name = obj.Name
-	def.Position = g_fileset.Position(types.DeclPos(obj))
+	def.Position = *pos
 	return def, nil
 }

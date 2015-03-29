@@ -7,7 +7,6 @@ import (
 
 	"code.google.com/p/rog-go/exp/go/ast"
 	"code.google.com/p/rog-go/exp/go/parser"
-	"code.google.com/p/rog-go/exp/go/types"
 )
 
 func (def Definition) findReferences(searchpath string, recursive bool) (chan Reference, chan error) {
@@ -28,14 +27,9 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 
 	scanAST := func(f ast.Node) {
 		check := func(expr ast.Expr) {
-			obj, _ := types.ExprType(expr, types.DefaultImporter)
-			if obj == nil {
-				return
-			}
-			position := g_fileset.Position(types.DeclPos(obj))
-
-			if position == def.Position {
-				refs <- Reference{g_fileset.Position(expr.Pos())}
+			pos := getDefPosition(expr)
+			if pos != nil && *pos == def.Position {
+				refs <- Reference{fileset.Position(expr.Pos())}
 			}
 		}
 
@@ -55,7 +49,7 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 	}
 
 	scanFile := func(filepath string) {
-		f, err := parser.ParseFile(g_fileset, filepath, nil, 0, getScope(filepath))
+		f, err := parser.ParseFile(fileset, filepath, nil, 0, getScope(filepath))
 		if failed(err) {
 			return
 		}
@@ -67,7 +61,7 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 		filter := func(fi os.FileInfo) bool {
 			return path.Ext(fi.Name()) == ".go"
 		}
-		result, err := parser.ParseDir(g_fileset, dirpath, filter, 0)
+		result, err := parser.ParseDir(fileset, dirpath, filter, 0)
 		if failed(err) {
 			return
 		}
