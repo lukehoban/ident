@@ -5,8 +5,8 @@ import (
 	"path"
 	"strings"
 
-	"code.google.com/p/rog-go/exp/go/ast"
-	"code.google.com/p/rog-go/exp/go/parser"
+	"github.com/rogpeppe/godef/go/ast"
+	"github.com/rogpeppe/godef/go/parser"
 )
 
 func (def Definition) findReferences(searchpath string, recursive bool) (chan Reference, chan error) {
