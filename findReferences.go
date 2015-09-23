@@ -49,6 +49,11 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 	}
 
 	scanFile := func(filepath string) {
+		defer func() {
+			if e := recover(); e != nil {
+				return
+			}
+		}()
 		f, err := parser.ParseFile(fileset, filepath, nil, 0, getScope(filepath))
 		if failed(err) {
 			return
@@ -61,6 +66,11 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 		filter := func(fi os.FileInfo) bool {
 			return path.Ext(fi.Name()) == ".go"
 		}
+		defer func() {
+			if e := recover(); e != nil {
+				return
+			}
+		}()
 		result, err := parser.ParseDir(fileset, dirpath, filter, 0)
 		if failed(err) {
 			return
