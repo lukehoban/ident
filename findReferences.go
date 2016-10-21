@@ -54,7 +54,7 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 				return
 			}
 		}()
-		f, err := parser.ParseFile(fileset, filepath, nil, 0, getScope(filepath))
+		f, err := parser.ParseFile(fileset, filepath, nil, 0, getScope(filepath), nil)
 		if failed(err) {
 			return
 		}
@@ -71,7 +71,7 @@ func (def Definition) findReferences(searchpath string, recursive bool) (chan Re
 				return
 			}
 		}()
-		result, err := parser.ParseDir(fileset, dirpath, filter, 0)
+		result, err := parser.ParseDir(fileset, dirpath, filter, 0, nil)
 		if failed(err) {
 			return
 		}
