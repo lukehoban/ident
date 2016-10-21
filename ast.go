@@ -24,7 +24,7 @@ func getScope(filepath string) *ast.Scope {
 }
 
 func getDefPosition(expr ast.Expr) *token.Position {
-	obj, _ := types.ExprType(expr, types.DefaultImporter)
+	obj, _ := types.ExprType(expr, types.DefaultImporter, fileset)
 	if obj == nil {
 		return nil
 	}
